@@ -1,6 +1,10 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ClientService } from './client.service';
-import { isDeliveryReport, parseWebhookPayload } from '@smsmode/rcs';
+import {
+  isDeliveryReport,
+  isIncomingMessage,
+  parseWebhookPayload,
+} from '@smsmode/rcs';
 
 @Controller('client')
 export class ClientController {
@@ -24,6 +28,16 @@ export class ClientController {
         'status:',
         payload.status.value,
       );
+    }
+    return { ok: true };
+  }
+
+  // Route de réception de MO
+  @Post('mo')
+  handleMo(@Body() body: unknown) {
+    const payload = parseWebhookPayload(body);
+    if (isIncomingMessage(payload)) {
+      console.log('MO reçu :', payload.body.text);
     }
     return { ok: true };
   }
