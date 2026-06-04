@@ -6,6 +6,6 @@ import { EnvironmentConfig } from '../_utils/config/env.config';
 @Module({
   controllers: [ClientController],
   providers: [ClientService, EnvironmentConfig],
-  imports: [EnvironmentConfig],
+  imports: [],
 })
 export class ClientModule {}
