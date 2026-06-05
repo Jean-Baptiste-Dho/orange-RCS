@@ -3,9 +3,13 @@ import {
   isDeliveryReport,
   isIncomingMessage,
   parseWebhookPayload,
+  RcsIncomingMessagePayload,
+  RcsSuggestionBase,
+  RcsWebhookPayload,
   SmsmodeRcsClient,
 } from '@smsmode/rcs';
 import { ConfigService } from '@nestjs/config';
+import { MessageBodyDto, RcsMessageDto } from './dto/response/basic-rcs.dto';
 
 @Injectable()
 export class RcsService {
@@ -67,9 +71,16 @@ export class RcsService {
 
   handleMo(body: unknown) {
     const payload = parseWebhookPayload(body);
+
     if (isIncomingMessage(payload)) {
       console.log('MO reçu :', payload.body.text);
+      return this.extractPostBackdataFromPayload(payload);
     }
     return { ok: true };
+  }
+
+  private extractPostBackdataFromPayload(rcs: RcsWebhookPayload) {
+    const test = rcs.body;
+    Object.keys(test).map((value) => console.log(value));
   }
 }

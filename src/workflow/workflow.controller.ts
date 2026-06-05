@@ -11,9 +11,4 @@ export class WorkflowController {
   createWorkflow(@Body() createWorkflowDto: CreateWorkflowDto) {
     return this.workflowService.create(createWorkflowDto);
   }
-
-  @Post()
-  manageCallback(workflow: WorkflowDto) {
-    return this.workflowService.answerTreatment(workflow);
-  }
 }

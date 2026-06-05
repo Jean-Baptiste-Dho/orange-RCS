@@ -10,7 +10,7 @@ export class WorkflowService {
     return await this.workflowRepository.createWorkflow(createWorkflowDto);
   }
 
-  answerTreatment(workflow: WorkflowDto) {
+  getCallbackAndMakeTreatment(workflow: WorkflowDto) {
     return workflow;
   }
 }

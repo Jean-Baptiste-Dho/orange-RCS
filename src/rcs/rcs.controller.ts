@@ -1,5 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { RcsService } from './rcs.service';
+import { MessageBodyDto } from './dto/response/basic-rcs.dto';
 
 @Controller('rcs')
 export class RcsController {
@@ -10,7 +11,7 @@ export class RcsController {
     return this.rcsService.sendRCS();
   }
 
-  @Post('dlr')
+  @Post('/dlr')
   handleDlr(@Body() body: unknown) {
     this.rcsService.handleDLR(body);
   }
@@ -18,5 +19,10 @@ export class RcsController {
   @Post('mo')
   handleMo(@Body() body: unknown) {
     this.rcsService.handleMo(body);
+  }
+
+  @Post('data')
+  getPostBackData(@Body() rcsBody: MessageBodyDto) {
+    this.rcsService.extractPostBackdataFromPayload(rcsBody: MessageBodyDto);
   }
 }
