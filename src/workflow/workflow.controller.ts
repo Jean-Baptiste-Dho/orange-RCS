@@ -1,6 +1,7 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { WorkflowService } from './workflow.service';
 import { CreateWorkflowDto } from './dto/create-workflow.dto';
+import { WorkflowDto } from './dto/workflow.dto';
 
 @Controller('workflow')
 export class WorkflowController {
@@ -12,7 +13,7 @@ export class WorkflowController {
   }
 
   @Post()
-  responseFromCallBack() {
-    return this.workflowService.answerTreatment();
+  manageCallback(workflow: WorkflowDto) {
+    return this.workflowService.answerTreatment(workflow);
   }
 }

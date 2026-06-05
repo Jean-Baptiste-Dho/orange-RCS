@@ -1,72 +1,31 @@
 import { Injectable } from '@nestjs/common';
-import { SmsmodeRcsClient } from '@smsmode/rcs';
+import {
+  isDeliveryReport,
+  isIncomingMessage,
+  parseWebhookPayload,
+  SmsmodeRcsClient,
+} from '@smsmode/rcs';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RcsService {
   constructor(private readonly configService: ConfigService) {}
   async sendRCS() {
-    const client = new SmsmodeRcsClient({
-      // apiKey: process.env.API_KEY || '',
+    const rcsClient = new SmsmodeRcsClient({
       apiKey: this.configService.get<string>('API_KEY') || '',
     });
 
-    const message = await client.send({
-      // recipient: { to: process.env.TARGET_PHONE || '' },
-      // body: { type: 'TEXT', text: 'Bonjour depuis smsmode RCS !' },
-      // callbackUrlStatus: 'https://smsmode-hack-team-7.ngrok.dev/client/dlr',
-      recipient: {
-        to: '33600000000',
-      },
+    const message = await rcsClient.send({
+      recipient: { to: process.env.TARGET_PHONE || '' },
+      //body: { type: 'TEXT', text: 'Bonjour depuis smsmode RCS !' },
       body: {
-        type: 'CAROUSEL',
-        contents: [
-          {
-            title: 'Start engaging with RCS',
-            description:
-              'Captivate your audience with media-rich messages and action buttons',
-            media: {
-              fileUrl: 'https://www.smsmode.com/img/card-1-rcs-demo.png',
-            },
-            suggestions: [
-              {
-                type: 'OPEN_URL',
-                url: 'https://www.smsmode.com/solutions-sms/rcs-messagerie-mobile/#fonctionnalite',
-                text: 'Discover RCS',
-                webviewSize: 'TALL',
-                postbackData: 'open_url',
-              },
-            ],
-          },
-          {
-            title: 'Get a certified profile',
-            description:
-              'Gain credibility and trust with a complete and verified profile',
-            media: {
-              fileUrl:
-                'https://www.smsmode.com/img/card-2-rcs-demo-profil-certifie.jpg',
-            },
-            suggestions: [
-              {
-                type: 'OPEN_URL',
-                url: 'https://www.smsmode.com/solutions-sms/rcs-messagerie-mobile#avantages',
-                text: 'Our commitments',
-                webviewSize: 'TALL',
-                postbackData: 'open_url',
-              },
-            ],
-          },
-          {
-            title: 'See RCS in action',
-            description: 'Take a look at what RCS can do for you',
-            media: {
-              fileUrl: 'https://www.smsmode.com/vds/Video-RCS-smsmode.mp4',
-              thumbnailUrl:
-                'https://www.smsmode.com/img/thumbnail-videos-smsmode.png',
-            },
-          },
-        ],
-        cardWidth: 'SMALL',
+        type: 'TEXT',
+        text:
+          'Welcome to the world of RCS ! 🎉' +
+          '\n\nDiscover the new channel that is transforming customer communication.' +
+          '\n\nChat without size limits, 𝘢𝘥𝘥 𝘴𝘵𝘺𝘭𝘦 to 𝘆𝗼𝘂𝗿 𝘁𝗲𝘅𝘁.' +
+          '\n\nAttach rich media and communicate from a verified brand profile.' +
+          '\n\nThe future of mobile marketing is here 🚀',
         suggestions: [
           {
             type: 'REPLY',
@@ -74,55 +33,43 @@ export class RcsService {
             postbackData: 'reply',
           },
           {
-            type: 'OPEN_URL',
-            url: 'https://www.smsmode.com',
-            text: 'Web site',
-            webviewSize: 'TALL',
-            postbackData: 'open_url',
-          },
-          {
-            type: 'DIAL_PHONE',
-            phoneNumber: '3349106463',
-            text: 'Call us',
-            postbackData: 'dial_phone',
-          },
-          {
-            type: 'SHOW_LOCATION',
-            text: 'Visit us',
-            label: 'smsmode© office',
-            latitude: 43.30307,
-            longitude: 5.37224,
-            postbackData: 'show_location',
-          },
-          {
-            type: 'REQUEST_LOCATION',
-            text: 'Share position',
-            postbackData: 'request_location',
-          },
-          {
-            type: 'CREATE_CALENDAR_EVENT',
-            text: 'Make an appointment',
-            title: 'RCS demo',
-            description: 'RCS presentation with smsmode !',
-            startTime: '2026-03-01T14:00:00Z',
-            endTime: '2026-03-01T16:00:00Z',
-            postbackData: 'create_calendar_event',
+            type: 'REPLY',
+            text: 'OUI',
+            postbackData: 'reply',
           },
         ],
       },
-      from: 'RcsCustomAgent',
-      sentDate: '2026-01-01T00:00:00',
       validity: {
-        amount: 10,
+        amount: 15,
         timeUnit: 'MINUTES',
       },
-      refClient: 'reference',
-      callbackUrlStatus:
-        "callbackUrlStatus: 'https://smsmode-hack-team-7.ngrok.dev/client/dlr'",
-      callbackUrlMo: 'https://callbackUrlMo.com',
+      callbackUrlStatus: 'https://smsmode-hack-team-7.ngrok.dev/rcs/dlr',
+      callbackUrlMo: 'https://smsmode-hack-team-7.ngrok.dev/rcs/mo',
     });
 
     console.log(message.messageId); // identifiant unique du message
     console.log(message.status.value); // "ENROUTE", "DELIVERED"..
+  }
+
+  handleDLR(body: unknown) {
+    const payload = parseWebhookPayload(body);
+    if (isDeliveryReport(payload)) {
+      console.log(
+        'DLR reçu :',
+        'messageId:',
+        payload.messageId,
+        'status:',
+        payload.status.value,
+      );
+    }
+    return { ok: true };
+  }
+
+  handleMo(body: unknown) {
+    const payload = parseWebhookPayload(body);
+    if (isIncomingMessage(payload)) {
+      console.log('MO reçu :', payload.body.text);
+    }
+    return { ok: true };
   }
 }
