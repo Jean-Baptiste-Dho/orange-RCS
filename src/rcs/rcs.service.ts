@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   isDeliveryReport,
+  isIncomingMessage,
   parseWebhookPayload,
   RcsMessage,
   SmsmodeRcsClient,
@@ -66,12 +67,11 @@ export class RcsService {
   }
 
   handleMo(body: unknown) {
-    return parseWebhookPayload(body);
-
-    // console.log(payload);
-    // if (isIncomingMessage(payload)) {
-    //   console.log('MO reçu :', payload.body.text);
-    // }
+    const payload = parseWebhookPayload(body);
+    if (isIncomingMessage(payload)) {
+      // console.log('MO reçu :', payload.body.text);
+      return payload.body.text;
+    }
     // return { ok: true };
   }
 
