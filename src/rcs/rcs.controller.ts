@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { RcsService } from './rcs.service';
-import { MessageBodyDto } from './dto/response/basic-rcs.dto';
+import type { RcsWebhookPayload } from '@smsmode/rcs';
 
 @Controller('rcs')
 export class RcsController {
@@ -21,8 +21,8 @@ export class RcsController {
     this.rcsService.handleMo(body);
   }
 
-  @Post('data')
-  getPostBackData(@Body() rcsBody: MessageBodyDto) {
-    this.rcsService.extractPostBackdataFromPayload(rcsBody: MessageBodyDto);
-  }
+  // @Post('data')
+  // getPostBackData(@Body() rcsBody: RcsWebhookPayload) {
+  //   this.rcsService.extractPostBackdataFromPayload(rcsBody);
+  // }
 }

@@ -3,13 +3,10 @@ import {
   isDeliveryReport,
   isIncomingMessage,
   parseWebhookPayload,
-  RcsIncomingMessagePayload,
-  RcsSuggestionBase,
   RcsWebhookPayload,
   SmsmodeRcsClient,
 } from '@smsmode/rcs';
 import { ConfigService } from '@nestjs/config';
-import { MessageBodyDto, RcsMessageDto } from './dto/response/basic-rcs.dto';
 
 @Injectable()
 export class RcsService {
