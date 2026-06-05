@@ -6,13 +6,13 @@ import { CreateWorkflowDto } from './dto/create-workflow.dto';
 export class WorkflowController {
   constructor(private readonly workflowService: WorkflowService) {}
 
-  @Post()
+  @Post('/create')
   createWorkflow(@Body() createWorkflowDto: CreateWorkflowDto) {
     return this.workflowService.create(createWorkflowDto);
   }
 
   @Post()
-  responseFromcallBack() {
+  responseFromCallBack() {
     return this.workflowService.answerTreatment();
   }
 }
