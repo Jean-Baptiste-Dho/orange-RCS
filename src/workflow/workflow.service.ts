@@ -13,4 +13,8 @@ export class WorkflowService {
   getCallbackAndMakeTreatment(workflow: WorkflowDto) {
     return workflow;
   }
+
+  startWorkflow(workflowId: number, customersPhoneNumber: string []) {
+
+  }
 }

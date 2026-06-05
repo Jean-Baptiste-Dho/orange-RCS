@@ -3,6 +3,9 @@ import {
   isDeliveryReport,
   isIncomingMessage,
   parseWebhookPayload,
+  RcsIncomingMessagePayload,
+  RcsSuggestionBase,
+  RcsTextBody,
   RcsWebhookPayload,
   SmsmodeRcsClient,
 } from '@smsmode/rcs';
@@ -71,13 +74,15 @@ export class RcsService {
 
     if (isIncomingMessage(payload)) {
       console.log('MO reçu :', payload.body.text);
-      return this.extractPostBackdataFromPayload(payload);
+      const { body } = payload;
+
+      const customerAnswer = this.extractPostBackdataFromPayload(body);
+      console.log(customerAnswer);
     }
     return { ok: true };
   }
 
-  private extractPostBackdataFromPayload(rcs: RcsWebhookPayload) {
-    const test = rcs.body;
-    Object.keys(test).map((value) => console.log(value));
+  private extractPostBackdataFromPayload(rcs: RcsTextBody) {
+    return rcs.suggestions;
   }
 }
