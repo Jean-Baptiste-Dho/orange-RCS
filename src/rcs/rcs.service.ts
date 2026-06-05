@@ -10,14 +10,14 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class RcsService {
   constructor(private readonly configService: ConfigService) {}
-  async sendRCS(rcsMessage: RcsMessage, clientTel: string) {
+  async sendRCS() {
     const rcsClient = new SmsmodeRcsClient({
       apiKey: this.configService.get<string>('API_KEY') || '',
     });
-    const ValidatedTelFormat = this.checkTelFormat(clientTel);
-
+    // const validatedTelFormat = this.checkTelFormat(clientTel);
+    const validatedTelFormat = '+33601105588';
     const message = await rcsClient.send({
-      recipient: { to: ValidatedTelFormat },
+      recipient: { to: validatedTelFormat },
       body: {
         type: 'TEXT',
         text:

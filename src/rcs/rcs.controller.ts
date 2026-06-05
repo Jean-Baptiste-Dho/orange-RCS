@@ -1,6 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { RcsService } from './rcs.service';
-import type { RcsWebhookPayload } from '@smsmode/rcs';
 
 @Controller('rcs')
 export class RcsController {
