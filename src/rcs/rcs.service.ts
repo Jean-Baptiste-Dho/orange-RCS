@@ -3,10 +3,7 @@ import {
   isDeliveryReport,
   isIncomingMessage,
   parseWebhookPayload,
-  RcsIncomingMessagePayload,
-  RcsSuggestionBase,
   RcsTextBody,
-  RcsWebhookPayload,
   SmsmodeRcsClient,
 } from '@smsmode/rcs';
 import { ConfigService } from '@nestjs/config';
@@ -72,6 +69,7 @@ export class RcsService {
   handleMo(body: unknown) {
     const payload = parseWebhookPayload(body);
 
+    console.log(payload);
     if (isIncomingMessage(payload)) {
       console.log('MO reçu :', payload.body.text);
       const { body } = payload;
