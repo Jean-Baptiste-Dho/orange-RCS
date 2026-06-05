@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import {
   isDeliveryReport,
-  isIncomingMessage,
   parseWebhookPayload,
-  RcsTextBody,
+  RcsMessage,
   SmsmodeRcsClient,
 } from '@smsmode/rcs';
 import { ConfigService } from '@nestjs/config';
@@ -11,14 +10,14 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class RcsService {
   constructor(private readonly configService: ConfigService) {}
-  async sendRCS() {
+  async sendRCS(rcsMessage: RcsMessage, clientTel: string) {
     const rcsClient = new SmsmodeRcsClient({
       apiKey: this.configService.get<string>('API_KEY') || '',
     });
+    const ValidatedTelFormat = this.checkTelFormat(clientTel);
 
     const message = await rcsClient.send({
-      recipient: { to: process.env.TARGET_PHONE_JB || '' },
-      //body: { type: 'TEXT', text: 'Bonjour depuis smsmode RCS !' },
+      recipient: { to: ValidatedTelFormat },
       body: {
         type: 'TEXT',
         text:
@@ -67,22 +66,19 @@ export class RcsService {
   }
 
   handleMo(body: unknown) {
-    const payload = parseWebhookPayload(body);
+    return parseWebhookPayload(body);
 
-    console.log(payload);
-    if (isIncomingMessage(payload)) {
-      console.log('MO reçu :', payload.body.text);
-      const { body } = payload;
-
-      /*
-      const customerAnswer = this.extractPostBackdataFromPayload(body);
-      console.log(customerAnswer);
-       */
-    }
-    return { ok: true };
+    // console.log(payload);
+    // if (isIncomingMessage(payload)) {
+    //   console.log('MO reçu :', payload.body.text);
+    // }
+    // return { ok: true };
   }
 
-  private extractPostBackdataFromPayload(rcs: RcsTextBody) {
-    return rcs.suggestions![0].postbackData;
+  private checkTelFormat(clientTel: string): string {
+    if (!clientTel.includes('+33') && clientTel.length !== 12) {
+      throw new Error('Tel format is incorrect');
+    }
+    return clientTel;
   }
 }

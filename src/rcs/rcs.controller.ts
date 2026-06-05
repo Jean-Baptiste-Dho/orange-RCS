@@ -18,7 +18,8 @@ export class RcsController {
 
   @Post('mo')
   handleMo(@Body() body: unknown) {
-    this.rcsService.handleMo(body);
+    const test = this.rcsService.handleMo(body);
+    console.log(test);
   }
 
   // @Post('data')
