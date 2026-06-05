@@ -26,4 +26,20 @@ export class WorkflowRepository {
     }
     return data;
   }
+
+  async getWorkflowById(workflowId: number): Promise<WorkflowEntity | null> {
+    const { data, error } = await this.supabaseProvider.client
+      .from('workflow')
+      .select()
+      .eq('id', workflowId)
+      .maybeSingle();
+
+    if (error) {
+      throw new InternalServerErrorException(
+        `Erreur lors de la récupération du workflow : ${error.message}`,
+      );
+    }
+
+    return data;
+  }
 }
