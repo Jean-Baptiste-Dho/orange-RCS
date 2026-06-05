@@ -3,45 +3,59 @@ import {
   isDeliveryReport,
   isIncomingMessage,
   parseWebhookPayload,
-  RcsMessage,
   SmsmodeRcsClient,
 } from '@smsmode/rcs';
 import { ConfigService } from '@nestjs/config';
+import { CreateRcsDto } from './dto/create-rcs.dto';
 
 @Injectable()
 export class RcsService {
   constructor(private readonly configService: ConfigService) {}
-  async sendRCS() {
+
+  async sendRCS(createRCSDto: CreateRcsDto, customerTelNumber: string) {
     const rcsClient = new SmsmodeRcsClient({
       apiKey: this.configService.get<string>('API_KEY') || '',
     });
-    // const validatedTelFormat = this.checkTelFormat(clientTel);
-    const validatedTelFormat = '+33601105588';
+
+    const suggestionsArray = createRCSDto.suggestions.map((suggestion) => ({
+      type: suggestion.type as 'REPLY',
+      text: suggestion.text,
+      postbackData: suggestion.postbackData,
+    }));
+    const validatedTelFormat = this.checkTelFormat(customerTelNumber);
     const message = await rcsClient.send({
       recipient: { to: validatedTelFormat },
+      /*
+        body: {
+          type: 'TEXT',
+          text:
+            'Welcome to the world of RCS ! 🎉' +
+            '\n\nDiscover the new channel that is transforming customer communication.' +
+            '\n\nChat without size limits, 𝘢𝘥𝘥 𝘴𝘵𝘺𝘭𝘦 to 𝘆𝗼𝘂𝗿 𝘁𝗲𝘅𝘁.' +
+            '\n\nAttach rich media and communicate from a verified brand profile.' +
+            '\n\nThe future of mobile marketing is here 🚀',
+          suggestions: [
+            {
+              type: 'REPLY',
+              text: 'STOP',
+              postbackData: 'stop',
+            },
+            {
+              type: 'REPLY',
+              text: 'OUI',
+              postbackData: 'oui',
+            },
+          ],
+        },
+         */
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       body: {
-        type: 'TEXT',
-        text:
-          'Welcome to the world of RCS ! 🎉' +
-          '\n\nDiscover the new channel that is transforming customer communication.' +
-          '\n\nChat without size limits, 𝘢𝘥𝘥 𝘴𝘵𝘺𝘭𝘦 to 𝘆𝗼𝘂𝗿 𝘁𝗲𝘅𝘁.' +
-          '\n\nAttach rich media and communicate from a verified brand profile.' +
-          '\n\nThe future of mobile marketing is here 🚀',
-        suggestions: [
-          {
-            type: 'REPLY',
-            text: 'STOP',
-            postbackData: 'stop',
-          },
-          {
-            type: 'REPLY',
-            text: 'OUI',
-            postbackData: 'oui',
-          },
-        ],
-      },
+        type: createRCSDto.type,
+        text: createRCSDto.text,
+        suggestions: suggestionsArray,
+      } as any,
       validity: {
-        amount: 15,
+        amount: 1440,
         timeUnit: 'MINUTES',
       },
       callbackUrlStatus: 'https://smsmode-hack-team-7.ngrok.dev/rcs/dlr',
@@ -69,10 +83,8 @@ export class RcsService {
   handleMo(body: unknown) {
     const payload = parseWebhookPayload(body);
     if (isIncomingMessage(payload)) {
-      // console.log('MO reçu :', payload.body.text);
       return payload.body.text;
     }
-    // return { ok: true };
   }
 
   private checkTelFormat(clientTel: string): string {

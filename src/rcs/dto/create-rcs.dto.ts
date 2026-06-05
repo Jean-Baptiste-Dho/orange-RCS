@@ -1,24 +1,12 @@
+import { Type } from 'class-transformer'; // 💡 Obligatoire pour le ValidateNested
 import { IsArray, IsEnum, IsString, ValidateNested } from 'class-validator';
-import { SuggestionDto } from './requests/create-rcs.dto';
 
 enum RcsTypeEnum {
-  BASIC = 'basic',
-  TEXT = 'text',
-  CARD = 'card',
-  CAROUSEL = 'carousel',
-  FILE = 'file',
-}
-
-export class CreateRcsDto {
-  @IsEnum(RcsTypeEnum)
-  enumType: RcsTypeEnum;
-
-  @IsString()
-  text: string;
-
-  @IsArray()
-  @ValidateNested({ each: true })
-  suggestions: SuggestionDto[];
+  BASIC = 'BASIC',
+  TEXT = 'TEXT',
+  CARD = 'CARD',
+  CAROUSEL = 'CAROUSEL',
+  FILE = 'FILE',
 }
 
 export class SuggestionsDto {
@@ -30,4 +18,17 @@ export class SuggestionsDto {
 
   @IsString()
   postbackData: string;
+}
+
+export class CreateRcsDto {
+  @IsEnum(RcsTypeEnum)
+  type: RcsTypeEnum;
+
+  @IsString()
+  text: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => SuggestionsDto)
+  suggestions: SuggestionsDto[];
 }
