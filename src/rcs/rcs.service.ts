@@ -17,7 +17,7 @@ export class RcsService {
     });
 
     const message = await rcsClient.send({
-      recipient: { to: process.env.TARGET_PHONE || '' },
+      recipient: { to: process.env.TARGET_PHONE_JB || '' },
       //body: { type: 'TEXT', text: 'Bonjour depuis smsmode RCS !' },
       body: {
         type: 'TEXT',
@@ -31,12 +31,12 @@ export class RcsService {
           {
             type: 'REPLY',
             text: 'STOP',
-            postbackData: 'reply',
+            postbackData: 'stop',
           },
           {
             type: 'REPLY',
             text: 'OUI',
-            postbackData: 'reply',
+            postbackData: 'oui',
           },
         ],
       },
@@ -74,8 +74,10 @@ export class RcsService {
       console.log('MO reçu :', payload.body.text);
       const { body } = payload;
 
+      /*
       const customerAnswer = this.extractPostBackdataFromPayload(body);
       console.log(customerAnswer);
+       */
     }
     return { ok: true };
   }
