@@ -83,6 +83,6 @@ export class RcsService {
   }
 
   private extractPostBackdataFromPayload(rcs: RcsTextBody) {
-    return rcs.suggestions;
+    return rcs.suggestions![0].postbackData;
   }
 }
