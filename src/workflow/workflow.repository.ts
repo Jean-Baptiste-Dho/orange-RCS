@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { SupabaseProvider } from '../supabase-client/supabase-provider';
-import { CreateWorkflowDto } from './dto/create-workflow.dto';
-import { WorkflowEntity } from './workflow.entity';
+import { CreateWorkflowDto } from './dto/request/create-workflow.dto';
+import { WorkflowTypes } from './workflow.types';
 
 @Injectable()
 export class WorkflowRepository {
@@ -9,7 +9,7 @@ export class WorkflowRepository {
 
   async createWorkflow(
     createWorkflowDto: CreateWorkflowDto,
-  ): Promise<WorkflowEntity> {
+  ): Promise<WorkflowTypes> {
     const { data, error } = await this.supabaseProvider.client
       .from('workflow')
       .insert({
@@ -27,7 +27,7 @@ export class WorkflowRepository {
     return data;
   }
 
-  async getWorkflowById(workflowId: number): Promise<WorkflowEntity | null> {
+  async getWorkflowById(workflowId: number): Promise<WorkflowTypes | null> {
     const { data, error } = await this.supabaseProvider.client
       .from('workflow')
       .select()
@@ -41,5 +41,31 @@ export class WorkflowRepository {
     }
 
     return data;
+  }
+
+  // workflow.repository.ts
+
+  async saveSession(phone: string, workflowId: number, nodeId: string) {
+    await this.supabaseProvider.client.from('rcs_session').upsert({
+      phone_number: phone,
+      workflow_id: workflowId,
+      current_node_id: nodeId,
+    });
+  }
+
+  async getSession(phone: string) {
+    const { data } = await this.supabaseProvider.client
+      .from('rcs_session')
+      .select()
+      .eq('phone_number', phone)
+      .maybeSingle();
+    return data;
+  }
+
+  async deleteSession(phone: string) {
+    await this.supabaseProvider.client
+      .from('rcs_session')
+      .delete()
+      .eq('phone_number', phone);
   }
 }

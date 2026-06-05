@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateWorkflowDto } from './dto/create-workflow.dto';
+import { CreateWorkflowDto } from './dto/request/create-workflow.dto';
 import { WorkflowRepository } from './workflow.repository';
-import { WorkflowDto } from './dto/workflow.dto';
 import { RcsService } from '../rcs/rcs.service';
+import { CreateRcsDto } from '../rcs/dto/create-rcs.dto';
 
 @Injectable()
 export class WorkflowService {
@@ -16,7 +16,7 @@ export class WorkflowService {
   }
 
   async getWorkflowById(workflowId: number) {
-    const workflow = await this.workflowRepository.findOneBy({ workflowId });
+    const workflow = await this.workflowRepository.getWorkflowById(workflowId);
 
     if (!workflow) {
       throw new NotFoundException(
@@ -27,11 +27,13 @@ export class WorkflowService {
   }
 
   async startWorkflow(workflowId: number, customersPhoneNumber: string[]) {
-    const workflow = await this.workflowRepository.getWorkflowById(workflowId);
+    const workflow = await this.getWorkflowById(workflowId);
+
+    const rscMessage: CreateRcsDto = workflow.node;
 
     for (const phoneNumber of customersPhoneNumber) {
       try {
-        await this.rcsService.sendRCS(workflow, phoneNumber);
+        await this.rcsService.sendRCS(rscMessage, phoneNumber);
         console.log(`[Workflow] RCS envoyé avec succès au ${phoneNumber}`);
       } catch (error) {
         console.error(
