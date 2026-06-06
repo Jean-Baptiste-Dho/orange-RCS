@@ -31,11 +31,13 @@ export class WorkflowService {
 
   /*
   async startWorkflow(workflowId: number, customersPhoneNumber: string[]) {
-    const workflow = await this.workflowRepository.getWorkflowById(workflowId);
+    const workflow = await this.getWorkflowById(workflowId);
+
+    const rscMessage: CreateRcsDto = workflow.node;
 
     for (const phoneNumber of customersPhoneNumber) {
       try {
-        await this.rcsService.sendRCS(workflow, phoneNumber);
+        await this.rcsService.sendRCS(rscMessage, phoneNumber);
         console.log(`[Workflow] RCS envoyé avec succès au ${phoneNumber}`);
       } catch (error) {
         console.error(
