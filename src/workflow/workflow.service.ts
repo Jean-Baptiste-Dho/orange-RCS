@@ -1,3 +1,4 @@
+/*
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateWorkflowDto } from './dto/create-workflow.dto';
 import { WorkflowRepository } from './workflow.repository';
@@ -6,30 +7,29 @@ import { RcsService } from '../rcs/rcs.service';
 
 @Injectable()
 export class WorkflowService {
-  constructor(
-    private readonly workflowRepository: WorkflowRepository,
-    private readonly rcsService: RcsService,
-  ) {}
+ constructor(
+   private readonly workflowRepository: WorkflowRepository,
+   private readonly rcsService: RcsService,
+ ) {}
 
-  async create(createWorkflowDto: CreateWorkflowDto) {
-    return await this.workflowRepository.createWorkflow(createWorkflowDto);
-  }
+ async create(createWorkflowDto: CreateWorkflowDto) {
+   return await this.workflowRepository.createWorkflow(createWorkflowDto);
+ }
 
-  /*
-  async getWorkflowById(workflowId: number) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const workflow = await this.workflowRepository.findOneBy({ workflowId });
+ async getWorkflowById(workflowId: number) {
+   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+   const workflow = await this.workflowRepository.findOneBy({ workflowId });
 
-    if (!workflow) {
-      throw new NotFoundException(
-        `Le workflow avec l'ID ${workflowId} n'existe pas.`,
-      );
-    }
-    return workflow;
-  }
-  */
+   if (!workflow) {
+     throw new NotFoundException(
+       `Le workflow avec l'ID ${workflowId} n'existe pas.`,
+     );
+   }
+   return workflow;
+ }
+ */
 
-  /*
+/*
   async startWorkflow(workflowId: number, customersPhoneNumber: string[]) {
     const workflow = await this.getWorkflowById(workflowId);
 
@@ -52,5 +52,5 @@ export class WorkflowService {
       message: `Workflow démarré pour ${customersPhoneNumber.length} clients.`,
     };
   }
-  */
 }
+   */
