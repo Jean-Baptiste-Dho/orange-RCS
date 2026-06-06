@@ -8,10 +8,10 @@ export class RcsController {
 
   @Post('send')
   sendRCS(
-    @Body('rscMessage') crsMessage: CreateRcsDto,
+    @Body('rcsMessage') rcsMessage: CreateRcsDto,
     @Body('customerTelNumber') customerTelNumber: string,
   ) {
-    return this.rcsService.sendRCS(crsMessage, customerTelNumber);
+    return this.rcsService.sendRCS(rcsMessage, customerTelNumber);
   }
 
   @Post('/dlr')

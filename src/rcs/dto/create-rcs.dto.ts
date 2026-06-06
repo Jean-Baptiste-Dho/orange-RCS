@@ -30,5 +30,5 @@ export class CreateRcsDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => SuggestionsDto)
-  suggestions: SuggestionsDto[];
+  suggestions: { type: string; text: string; postbackData: string }[];
 }

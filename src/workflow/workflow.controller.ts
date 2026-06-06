@@ -11,6 +11,7 @@ export class WorkflowController {
     return this.workflowService.create(createWorkflowDto);
   }
 
+  /*
   @Post(':workflowId/start')
   startWorkflow(
     @Param('workflowId') workflowId: number,
@@ -18,4 +19,5 @@ export class WorkflowController {
   ) {
     return this.workflowService.startWorkflow(workflowId, customerPhonenumber);
   }
+   */
 }

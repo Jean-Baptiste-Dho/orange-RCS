@@ -15,7 +15,9 @@ export class WorkflowService {
     return await this.workflowRepository.createWorkflow(createWorkflowDto);
   }
 
+  /*
   async getWorkflowById(workflowId: number) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const workflow = await this.workflowRepository.findOneBy({ workflowId });
 
     if (!workflow) {
@@ -25,7 +27,9 @@ export class WorkflowService {
     }
     return workflow;
   }
+  */
 
+  /*
   async startWorkflow(workflowId: number, customersPhoneNumber: string[]) {
     const workflow = await this.workflowRepository.getWorkflowById(workflowId);
 
@@ -46,4 +50,5 @@ export class WorkflowService {
       message: `Workflow démarré pour ${customersPhoneNumber.length} clients.`,
     };
   }
+  */
 }
