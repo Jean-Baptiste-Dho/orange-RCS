@@ -80,11 +80,92 @@ export class RcsService {
     return { ok: true };
   }
 
-  handleMo(body: unknown) {
+  /*handleMo(body: unknown) {
     const payload = parseWebhookPayload(body);
     if (isIncomingMessage(payload)) {
       return payload.body.text;
     }
+  }
+   */
+
+  async handleMo(body: unknown) {
+    const payload = parseWebhookPayload(body);
+    //console.log('payload complet:', JSON.stringify(payload));
+    if (!isIncomingMessage(payload)) return;
+
+    const postbackData = (payload.body as any).postbackData;
+    const customerTel = '+' + payload.recipient.to;
+
+    await this.sendDecisionMessage(postbackData, customerTel);
+  }
+
+  private async sendDecisionMessage(postbackData: string, customerTel: string) {
+    const rcsClient = new SmsmodeRcsClient({
+      apiKey: this.configService.get<string>('API_KEY') || '',
+    });
+
+    const messages: Record<string, any> = {
+      // Niveau 2 — réponse à "Oui, je veux une option voyage"
+      user_optin_yes: {
+        type: 'TEXT',
+        text: 'Super ! Voici les deux options les mieux adaptées pour votre séjour à Barcelone',
+        suggestions: [
+          {
+            type: 'REPLY',
+            text: 'Pass Voyage Léger',
+            postbackData: 'pass_leger',
+          },
+          {
+            type: 'REPLY',
+            text: 'Pass Voyage Intense',
+            postbackData: 'pass_intense',
+          },
+        ],
+      },
+
+      // Niveau 2 — réponse à "Non merci"
+      user_optin_no: {
+        type: 'TEXT',
+        text: "Pas de problème ! Si vous changez d'idée, n'hésitez pas à visiter le site d'Orange. Bon voyage !",
+        suggestions: [],
+      },
+
+      // Niveau 3 — Pass Voyage Léger
+      pass_leger: {
+        type: 'TEXT',
+        text: "Vous disposez de\n5Go de données + 30 min d'appels\n7 jours à 15€",
+        suggestions: [
+          { type: 'REPLY', text: 'Choisir', postbackData: 'confirm_choice' },
+        ],
+      },
+
+      // Niveau 3 — Pass Voyage Intense
+      pass_intense: {
+        type: 'TEXT',
+        text: 'Vous disposez de\n20Go de données + Appels illimités\n14 jours — 29€',
+        suggestions: [
+          { type: 'REPLY', text: 'Choisir', postbackData: 'confirm_choice' },
+        ],
+      },
+
+      // Niveau 4 — Confirmation finale
+      confirm_choice: {
+        type: 'TEXT',
+        text: 'Super, votre choix a été enregistré ! Vous allez recevoir un mail de confirmation dans quelques minutes.',
+        suggestions: [],
+      },
+    };
+
+    const messageBody = messages[postbackData];
+    if (!messageBody) return; // postbackData inconnu, on ignore
+
+    await rcsClient.send({
+      recipient: { to: customerTel },
+      body: messageBody,
+      validity: { amount: 1440, timeUnit: 'MINUTES' },
+      callbackUrlStatus: 'https://smsmode-hack-team-7.ngrok.dev/rcs/dlr',
+      callbackUrlMo: 'https://smsmode-hack-team-7.ngrok.dev/rcs/mo',
+    });
   }
 
   private checkTelFormat(clientTel: string): string {

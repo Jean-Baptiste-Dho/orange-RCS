@@ -1,3 +1,173 @@
+# SmartFlow
+
+SmartFlow est une interface no-code permettant à des utilisateurs non développeurs de créer et gérer des workflows de messages RCS — des scénarios de communication mobile enrichis, notamment à des fins marketing.
+
+---
+
+## Équipe
+
+| Rôle | Membre |
+|---|---|
+| Design | Yang Zheng, Audrey Chiaramonte |
+| Parcours utilisateur | Audrey Chiaramonte |
+| Développement front-end | Walid Ziani |
+| Développement back-end | Jean-Baptiste Dho, Kathleen Chaiffre |
+
+---
+
+## Stack technique
+
+- **Back-end** : NestJS (Node.js / TypeScript)
+- **Front-end** : React + Vite + TypeScript
+- **Base de données** : Supabase (PostgreSQL)
+- **Messagerie RCS** : smsmode RCS SDK (`@smsmode/rcs`)
+- **Tunnel de développement** : ngrok
+
+---
+
+## Prérequis
+
+- Node.js >= 18
+- npm >= 9
+- Un compte [smsmode](https://www.smsmode.com) avec une clé API RCS
+- Un projet [Supabase](https://supabase.com) configuré
+- [ngrok](https://ngrok.com) installé pour les webhooks en local
+
+---
+
+## Installation
+
+```bash
+# Cloner le projet
+git clone https://github.com/Jean-Baptiste-Dho/orange-RCS.git
+cd orange-RCS
+
+# Installer les dépendances du back-end
+npm install
+
+# Installer les dépendances du front-end
+cd front
+npm install
+cd ..
+```
+
+---
+
+## Configuration
+
+Créer un fichier `.env` à la racine du projet :
+
+```env
+API_KEY=votre_clé_api_smsmode
+AUTH_TOKEN=votre_auth_token
+TARGET_PHONE=+33600000000
+SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
+SUPABASE_PUBLIC_KEY=votre_clé_publique_supabase
+```
+
+---
+
+## Lancer l'application
+
+**Back-end** (depuis la racine) :
+
+```bash
+npm run start:dev
+```
+
+Le serveur démarre sur `http://localhost:3001`.
+
+**Front-end** (depuis le dossier `front/`) :
+
+```bash
+cd front
+npm run dev
+```
+
+L'interface est accessible sur `http://localhost:5173`.
+
+**Tunnel ngrok** (pour recevoir les webhooks RCS) :
+
+```bash
+ngrok http 3001
+```
+
+---
+
+## Routes API
+
+### RCS
+
+| Méthode | Route | Description |
+|---|---|---|
+| `POST` | `/rcs/send` | Envoie un message RCS à un destinataire |
+| `POST` | `/rcs/dlr` | Webhook de statut de livraison (DLR) |
+| `POST` | `/rcs/mo` | Webhook de réception de réponse utilisateur (MO) |
+
+**Exemple de body pour `/rcs/send` :**
+
+```json
+{
+  "rcsMessage": {
+    "type": "TEXT",
+    "text": "Votre message ici",
+    "suggestions": [
+      {
+        "type": "REPLY",
+        "text": "Oui",
+        "postbackData": "user_optin_yes"
+      },
+      {
+        "type": "REPLY",
+        "text": "Non merci",
+        "postbackData": "user_optin_no"
+      }
+    ]
+  },
+  "customerTelNumber": "+33600000000"
+}
+```
+
+### Workflows
+
+| Méthode | Route | Description |
+|---|---|---|
+| `POST` | `/workflow/create` | Crée un nouveau workflow en base de données |
+
+---
+
+## Fonctionnement du scénario décisionnel
+
+SmartFlow supporte des arbres de décision multi-niveaux. Lorsqu'un utilisateur répond à un message RCS, le webhook MO (`/rcs/mo`) reçoit la réponse et déclenche automatiquement l'envoi du message suivant selon le `postbackData`.
+
+```
+[Postman / Front] → POST /rcs/send → Message RCS envoyé au téléphone
+                                              ↓
+                              L'utilisateur clique sur un bouton
+                                              ↓
+                         Webhook MO → POST /rcs/mo → Message suivant envoyé
+```
+
+---
+
+## Structure du projet
+
+```
+orange-RCS/
+├── front/              # Application React (front-end)
+│   └── src/
+│       ├── components/ # Composants UI (LeftSidebar, RightSidebar, nodes)
+│       └── pages/      # Pages (WorkflowList, éditeur)
+├── src/                # Application NestJS (back-end)
+│   ├── rcs/            # Module RCS (envoi, DLR, MO, arbre décisionnel)
+│   └── workflow/       # Module Workflow (CRUD Supabase)
+├── .env                # Variables d'environnement (non versionné)
+└── README.md
+```
+
+
+## ReadMe NestJS
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
